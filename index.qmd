@@ -1,8 +1,8 @@
 ---
-title: "Impacto das enchentes do RS/Brasil no preço de aluguéis"
+title: "Impacto das enchentes no preço de aluguéis"
 author: "Arquimedes Macedo"
 format: html
-editor: visual
+lang: pt-BR
 ---
 
 ```{r message=FALSE, warning=FALSE, include=FALSE}
@@ -101,11 +101,33 @@ rs2024 <- read_excel("2024-alturas.xlsx",
   select(cidade, data_inclusao, preco_unitario, altura)
 ```
 
+
+```{r}
+# 04, 05, 06, 07, 08, 09, 10, 11, 12
+ipca_2023 <- c(-0.49)
+sinapi_2023 <- c(1678.70, 1684.29, 1697.13, 1703.47, 1727.96, 1728.72, 1730.29, 1731.46, 1734.32)
+fipezap_2023 <- c(124.40, 126.28, 128.88, 130.78, 132.73, 134.13, 135.56, 136.95, 138.07)
+ipca_2024 <- c()
+sinapi_2024 <- c(1735.48, 1735.65, 1743.89, 1744.18, 1769.02, 1769.19, 1778.76, 1778.27, 1778.27)
+fipezap_2023 <- c(143.63, 146.08, 151.14, 157.64, 164.06, 168.36, 170.58, 172.82, 172.82)
+```
+
+
+## Contextualização
+
+Em Abril de 2024, o Rio Grande do Sul sofreu com fortes chuvas que resultaram em enchentes em diversas cidades do estado. Estas enchentes causaram danos materiais e prejuízos para a população, incluindo a perda de imóveis e a necessidade de realocação de moradores.
+
 ## A questão de pesquisa
 
 Este trabalho tem como objetivo analisar a influência da altura em relação ao nível do mar no preço de anúncios de locação pós enchentes do RS/Brasil.
 
 Mais especificamente, houve uma mudança significativa da influência dessa altura no preço de anúncios de locação após as enchentes?
+
+::: callout-tip
+### Ideia
+
+Como a percepção de valor é algo subjetivo, é possível que a altura em relação ao nível do mar tenha se tornado um fator mais relevante na decisão de alugar um imóvel após as enchentes.
+:::
 
 Para ajudar a responder esta pergunta, foram coletados dados de anúncios de locação de imóveis em diferentes cidades do RS/Brasil, com informações sobre a altura em relação ao nível do mar e o preço unitário do aluguel.
 
@@ -118,12 +140,6 @@ Esta é uma medida que simplifica a comparação entre imóveis de diferentes ta
 :::
 
 ## Análise exploratória
-
-```{r}
-#| fig-cap:
-#|   - "Distribuição geográfica dos anúncios de 2024"
-knitr::include_graphics("flooded-area-2024-ads.png")
-```
 
 Para iniciar a análise, vamos verifica os dados tabelados de 2023.
 
@@ -173,9 +189,33 @@ datatable(
 ```
 :::
 
-Primeiramente, vemos que estamos comparando o mesmo período de 2024 com 2023.
+::: callout-warning
+### *Insights*
 
-Notamos, também, que a mediana do preço unitário dos aluguéis é maior em 2024 do que em 2023 para todas as cidades, exceto Esteio. Mas observa-se que houve uma diminuição de imóveis em pontos altos da cidade.
+-   Estamos comparando o mesmo período de 2024 com 2023.
+-   A mediana do preço unitário dos aluguéis é maior em 2024 do que em 2023 para todas as cidades, exceto Esteio.
+-   Em Esteio houve uma diminuição de imóveis em pontos altos da cidade.
+:::
+
+### Distribuição Geográfica
+
+Vamos visualizar a distribuição geográfica dos imóveis em 2024, para observar quais estão em áreas de risco.
+
+Na imagem abaixo vemos o leito do Rio dos Sinos em até 10 metros de altura.
+
+```{r}
+#| fig-cap:
+#|   - "Distribuição geográfica dos anúncios de 2024"
+knitr::include_graphics("flooded-area-2024-ads.png")
+```
+
+
+::: callout-warning
+### *Insights*
+
+- Há uma boa distribuição em imóveis que estão em áreas de risco e em áreas seguras.
+:::
+
 
 ## Análise gráfica
 
@@ -188,9 +228,13 @@ Vamos verificar a relação entre nossas variáveis de interesse.
 #|   - "Anúncios em 2023"
 #|   - "Anúncios em 2024"
 
-ggpairs(rs2023, mapping = aes(color = cidade, alpha = 0.4))
+ggpairs(rs2023 %>% select(-data_inclusao), mapping = aes(color = cidade, alpha = 0.4)) +
+  theme.base +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-ggpairs(rs2024, mapping = aes(color = cidade, alpha = 0.4))
+ggpairs(rs2024 %>% select(-data_inclusao), mapping = aes(color = cidade, alpha = 0.4)) +
+  theme.base +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
 ::: callout-warning
@@ -232,9 +276,10 @@ ggarrange(
 ```
 
 ::: callout-warning
-### *Insight*
+### *Insights*
 
-Observa-se que o preço unitário dos aluguéis aumentou em 2024 em relação a 2023.
+- O preço unitário dos aluguéis aumentou em 2024 em relação a 2023.
+- Houve um aumento de variabilidade nos preços em 2024.
 :::
 
 ## Modelagem

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR" xml:lang="pt-BR"><head>
 
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.6.39">
@@ -8,7 +8,7 @@
 
 <meta name="author" content="Arquimedes Macedo">
 
-<title>Impacto das enchentes do RS/Brasil no preço de aluguéis</title>
+<title>Impacto das enchentes no preço de aluguéis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -95,7 +95,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Impacto das enchentes do RS/Brasil no preço de aluguéis</h1>
+<h1 class="title">Impacto das enchentes no preço de aluguéis</h1>
 </div>
 
 
@@ -103,7 +103,7 @@ window.Quarto = {
 <div class="quarto-title-meta">
 
     <div>
-    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-heading">Autor</div>
     <div class="quarto-title-meta-contents">
              <p>Arquimedes Macedo </p>
           </div>
@@ -118,10 +118,27 @@ window.Quarto = {
 </header>
 
 
+<section id="contextualização" class="level2">
+<h2 class="anchored" data-anchor-id="contextualização">Contextualização</h2>
+<p>Em Abril de 2024, o Rio Grande do Sul sofreu com fortes chuvas que resultaram em enchentes em diversas cidades do estado. Estas enchentes causaram danos materiais e prejuízos para a população, incluindo a perda de imóveis e a necessidade de realocação de moradores.</p>
+</section>
 <section id="a-questão-de-pesquisa" class="level2">
 <h2 class="anchored" data-anchor-id="a-questão-de-pesquisa">A questão de pesquisa</h2>
 <p>Este trabalho tem como objetivo analisar a influência da altura em relação ao nível do mar no preço de anúncios de locação pós enchentes do RS/Brasil.</p>
 <p>Mais especificamente, houve uma mudança significativa da influência dessa altura no preço de anúncios de locação após as enchentes?</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Ideia
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Como a percepção de valor é algo subjetivo, é possível que a altura em relação ao nível do mar tenha se tornado um fator mais relevante na decisão de alugar um imóvel após as enchentes.</p>
+</div>
+</div>
 <p>Para ajudar a responder esta pergunta, foram coletados dados de anúncios de locação de imóveis em diferentes cidades do RS/Brasil, com informações sobre a altura em relação ao nível do mar e o preço unitário do aluguel.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -140,16 +157,6 @@ Preço unitário
 </section>
 <section id="análise-exploratória" class="level2">
 <h2 class="anchored" data-anchor-id="análise-exploratória">Análise exploratória</h2>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="flooded-area-2024-ads.png" class="img-fluid figure-img" data-keepaspectratio="true"></p>
-<figcaption>Distribuição geográfica dos anúncios de 2024</figcaption>
-</figure>
-</div>
-</div>
-</div>
 <p>Para iniciar a análise, vamos verifica os dados tabelados de 2023.</p>
 <div class="callout callout-style-simple callout-none no-icon">
 <div class="callout-body d-flex">
@@ -159,8 +166,8 @@ Preço unitário
 <div class="callout-body-container">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-71dcd9c8a7a8c4ea4223" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-71dcd9c8a7a8c4ea4223">{"x":{"filter":"none","vertical":false,"caption":"<caption>Resumo dos dados de 2023<\/caption>","data":[["1","2","3","4","5"],["Canoas","Esteio","Novo Hamburgo","Sapucaia do Sul","São Leopoldo"],[970,35,685,167,800],[25,19,23,15,19],[21,23,40,40,15],["2023-04-01","2023-04-08","2023-04-11","2023-04-08","2023-04-01"],["2023-12-29","2023-11-29","2023-12-21","2023-12-23","2023-12-28"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Cidade<\/th>\n      <th>N<\/th>\n      <th>Mediana p. unitário<\/th>\n      <th>Mediana altura<\/th>\n      <th>Data mín.<\/th>\n      <th>Data máx.<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"cidade","targets":1},{"name":"n","targets":2},{"name":"med_preco_unitario","targets":3},{"name":"med_altura","targets":4},{"name":"min_data","targets":5},{"name":"max_data","targets":6}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-f4f159a6302c8708878a" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-f4f159a6302c8708878a">{"x":{"filter":"none","vertical":false,"caption":"<caption>Resumo dos dados de 2023<\/caption>","data":[["1","2","3","4","5"],["Canoas","Esteio","Novo Hamburgo","Sapucaia do Sul","São Leopoldo"],[970,35,685,167,800],[25,19,23,15,19],[21,23,40,40,15],["2023-04-01","2023-04-08","2023-04-11","2023-04-08","2023-04-01"],["2023-12-29","2023-11-29","2023-12-21","2023-12-23","2023-12-28"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Cidade<\/th>\n      <th>N<\/th>\n      <th>Mediana p. unitário<\/th>\n      <th>Mediana altura<\/th>\n      <th>Data mín.<\/th>\n      <th>Data máx.<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"cidade","targets":1},{"name":"n","targets":2},{"name":"med_preco_unitario","targets":3},{"name":"med_altura","targets":4},{"name":"min_data","targets":5},{"name":"max_data","targets":6}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </div>
@@ -175,15 +182,60 @@ Preço unitário
 <div class="callout-body-container">
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-0f5660654ac91dbf0d5d" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-0f5660654ac91dbf0d5d">{"x":{"filter":"none","vertical":false,"caption":"<caption>Resumo dos dados de 2024<\/caption>","data":[["1","2","3","4","5"],["Canoas","Esteio","Novo Hamburgo","Sapucaia do Sul","São Leopoldo"],[579,107,974,145,954],[30,18,25,19,21],[20,15,39,38,13],["2024-04-01","2024-04-02","2024-04-01","2024-04-02","2024-04-01"],["2024-12-04","2024-12-04","2024-12-03","2024-12-02","2024-12-03"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Cidade<\/th>\n      <th>N<\/th>\n      <th>Mediana p. unitário<\/th>\n      <th>Mediana altura<\/th>\n      <th>Data mín.<\/th>\n      <th>Data máx.<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"cidade","targets":1},{"name":"n","targets":2},{"name":"med_preco_unitario","targets":3},{"name":"med_altura","targets":4},{"name":"min_data","targets":5},{"name":"max_data","targets":6}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-5d87e84f14147d8de18d" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-5d87e84f14147d8de18d">{"x":{"filter":"none","vertical":false,"caption":"<caption>Resumo dos dados de 2024<\/caption>","data":[["1","2","3","4","5"],["Canoas","Esteio","Novo Hamburgo","Sapucaia do Sul","São Leopoldo"],[579,107,974,145,954],[30,18,25,19,21],[20,15,39,38,13],["2024-04-01","2024-04-02","2024-04-01","2024-04-02","2024-04-01"],["2024-12-04","2024-12-04","2024-12-03","2024-12-02","2024-12-03"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Cidade<\/th>\n      <th>N<\/th>\n      <th>Mediana p. unitário<\/th>\n      <th>Mediana altura<\/th>\n      <th>Data mín.<\/th>\n      <th>Data máx.<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"cidade","targets":1},{"name":"n","targets":2},{"name":"med_preco_unitario","targets":3},{"name":"med_altura","targets":4},{"name":"min_data","targets":5},{"name":"max_data","targets":6}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </div>
 </div>
 </div>
-<p>Primeiramente, vemos que estamos comparando o mesmo período de 2024 com 2023.</p>
-<p>Notamos, também, que a mediana do preço unitário dos aluguéis é maior em 2024 do que em 2023 para todas as cidades, exceto Esteio. Mas observa-se que houve uma diminuição de imóveis em pontos altos da cidade.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<em>Insights</em>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Estamos comparando o mesmo período de 2024 com 2023.</li>
+<li>A mediana do preço unitário dos aluguéis é maior em 2024 do que em 2023 para todas as cidades, exceto Esteio.</li>
+<li>Em Esteio houve uma diminuição de imóveis em pontos altos da cidade.</li>
+</ul>
+</div>
+</div>
+<section id="distribuição-geográfica" class="level3">
+<h3 class="anchored" data-anchor-id="distribuição-geográfica">Distribuição Geográfica</h3>
+<p>Vamos visualizar a distribuição geográfica dos imóveis em 2024, para observar quais estão em áreas de risco.</p>
+<p>Na imagem abaixo vemos o leito do Rio dos Sinos em até 10 metros de altura.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="flooded-area-2024-ads.png" class="img-fluid figure-img" data-keepaspectratio="true"></p>
+<figcaption>Distribuição geográfica dos anúncios de 2024</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<em>Insights</em>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Há uma boa distribuição em imóveis que estão em áreas de risco e em áreas seguras.</li>
+</ul>
+</div>
+</div>
+</section>
 </section>
 <section id="análise-gráfica" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="análise-gráfica">Análise gráfica</h2>
@@ -196,7 +248,7 @@ Preço unitário
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" data-keepaspectratio="true" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" data-keepaspectratio="true" width="672"></p>
 <figcaption>Anúncios em 2023</figcaption>
 </figure>
 </div>
@@ -204,7 +256,7 @@ Preço unitário
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-8-2.png" class="img-fluid figure-img" data-keepaspectratio="true" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-9-2.png" class="img-fluid figure-img" data-keepaspectratio="true" width="672"></p>
 <figcaption>Anúncios em 2024</figcaption>
 </figure>
 </div>
@@ -233,7 +285,7 @@ Preço unitário
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" data-keepaspectratio="true" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" data-keepaspectratio="true" width="672"></p>
 </figure>
 </div>
 </div>
@@ -244,11 +296,14 @@ Preço unitário
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<em>Insight</em>
+<em>Insights</em>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Observa-se que o preço unitário dos aluguéis aumentou em 2024 em relação a 2023.</p>
+<ul>
+<li>O preço unitário dos aluguéis aumentou em 2024 em relação a 2023.</li>
+<li>Houve um aumento de variabilidade nos preços em 2024.</li>
+</ul>
 </div>
 </div>
 </section>
@@ -401,7 +456,7 @@ Preço unitário
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" data-keepaspectratio="true" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" data-keepaspectratio="true" width="672"></p>
 <figcaption>Modelo de 2023</figcaption>
 </figure>
 </div>
@@ -409,7 +464,7 @@ Preço unitário
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-15-2.png" class="img-fluid figure-img" data-keepaspectratio="true" width="672"></p>
+<p><img src="index_files/figure-html/unnamed-chunk-16-2.png" class="img-fluid figure-img" data-keepaspectratio="true" width="672"></p>
 <figcaption>Modelo de 2024</figcaption>
 </figure>
 </div>
@@ -427,8 +482,8 @@ Preço unitário
 \]</span></p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-318854658651cdf3f198" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-318854658651cdf3f198">{"x":{"filter":"none","vertical":false,"caption":"<caption>Testes para diferença entre os coeficientes de altura dos modelos de 2023 e 2024<\/caption>","data":[["1","2"],["T","Clogg"],[-188.0256,-3.5901],[0,0.0003]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Teste<\/th>\n      <th>Estatística<\/th>\n      <th>P-valor<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"teste","targets":1},{"name":"estatistica","targets":2},{"name":"p_valor","targets":3}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-73f609db22842be5b60f" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-73f609db22842be5b60f">{"x":{"filter":"none","vertical":false,"caption":"<caption>Testes para diferença entre os coeficientes de altura dos modelos de 2023 e 2024<\/caption>","data":[["1","2"],["T","Clogg"],[-188.0256,-3.5901],[0,0.0003]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Teste<\/th>\n      <th>Estatística<\/th>\n      <th>P-valor<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"teste","targets":1},{"name":"estatistica","targets":2},{"name":"p_valor","targets":3}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <p>Assim, os testes indicam que houve uma mudança significativa na influência da altura no preço unitário dos aluguéis.</p>
@@ -500,12 +555,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // flash "checked"
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
+    button.setAttribute("title", "Copiada");
     let tooltip;
     if (window.bootstrap) {
       button.setAttribute("data-bs-toggle", "tooltip");
       button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
+      button.setAttribute("data-bs-title", "Copiada");
       tooltip = new bootstrap.Tooltip(button, 
         { trigger: "manual", 
           customClass: "code-copy-button-tooltip",
