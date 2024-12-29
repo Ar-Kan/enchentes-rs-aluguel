@@ -1,0 +1,491 @@
+---
+title: "Impacto das enchentes do RS/Brasil no preço de aluguéis"
+author: "Arquimedes Macedo"
+format: html
+editor: visual
+---
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+Sys.setenv(lang = "en_US")
+Sys.setlocale("LC_ALL", "en_US.UTF-8")
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  out.extra = "keepaspectratio=true",
+  fig.align = "center"
+)
+```
+
+```{r}
+required_packages <- c("tidyverse", "dplyr", "GGally", "gridExtra", "knitr", "gganimate",
+                       "broom", "purrr", "plotly", "ggfortify", "reshape2", "skimr",
+                       "readxl", "ggpubr", "olsrr", "glmnet", "DT", "sjPlot", "sjmisc",
+                       "sjlabelled", "ggplot2")
+
+for (pkg in required_packages) {
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+    library(pkg, character.only = TRUE)
+  }
+}
+```
+
+```{r}
+theme.base <- theme_minimal(base_size = 11) +
+  theme(
+    axis.text = element_text(size = 8),
+    plot.title = element_text(hjust = 0.5, size = 10, face = "bold"),
+    axis.title = element_text(size = 8),
+    legend.title = element_text(size = 8),
+    panel.grid.major = element_line(colour = "grey90", linewidth = 0.5),
+    panel.grid.minor = element_line(colour = adjustcolor("grey90", alpha.f = 0.5), linewidth = 0.25),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    plot.background = element_blank(),
+    axis.line.x = element_line(colour = "grey"),
+    axis.line.y = element_line(colour = "grey"),
+  )
+
+theme.no_legend <- theme(legend.position = "none")
+
+theme.legend_bottom <- theme(legend.position = "bottom")
+
+theme.no_grid <- theme(
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank()
+)
+
+theme.no_axis <- theme(
+  axis.line.x = element_blank(),
+  axis.line.y = element_blank()
+)
+
+# Theme for timeseries with legend
+apply.theme.ts.legend <- function() {
+  list(
+    scale_x_date(date_labels = "%b %d", date_breaks = "1 week"),
+    theme.base +
+      theme(
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank()
+      )
+  )
+}
+```
+
+```{r}
+rs2023 <- read_excel("2023-alturas.xlsx",
+  col_types = c(
+    "date", "skip", "skip",
+    "skip", "skip", "skip", "skip", "skip",
+    "skip", "skip", "skip", "skip", "text",
+    "skip", "numeric", "numeric", "numeric",
+    "numeric", "numeric"
+  )
+) %>%
+  filter(preco_unitario < 150 & cidade != "Porto Alegre") %>%
+  select(cidade, data_inclusao, preco_unitario, altura)
+
+rs2024 <- read_excel("2024-alturas.xlsx",
+  col_types = c(
+    "date", "skip", "skip",
+    "skip", "skip", "skip", "skip", "skip",
+    "skip", "skip", "skip", "skip", "text",
+    "skip", "numeric", "numeric", "numeric",
+    "numeric", "numeric"
+  )
+) %>%
+  filter(preco_unitario < 150 & cidade != "Porto Alegre") %>%
+  select(cidade, data_inclusao, preco_unitario, altura)
+```
+
+## A questão de pesquisa
+
+Este trabalho tem como objetivo analisar a influência da altura em relação ao nível do mar no preço de anúncios de locação pós enchentes do RS/Brasil.
+
+Mais especificamente, houve uma mudança significativa da influência dessa altura no preço de anúncios de locação após as enchentes?
+
+Para ajudar a responder esta pergunta, foram coletados dados de anúncios de locação de imóveis em diferentes cidades do RS/Brasil, com informações sobre a altura em relação ao nível do mar e o preço unitário do aluguel.
+
+::: callout-tip
+### Preço unitário
+
+Esta é uma medida que simplifica a comparação entre imóveis de diferentes tamanhos.
+
+É calculada através da razão entre o preço do aluguel e a área do imóvel, ou seja, é o preço do aluguel por metro quadrado.
+:::
+
+## Análise exploratória
+
+```{r}
+#| fig-cap:
+#|   - "Distribuição geográfica dos anúncios de 2024"
+knitr::include_graphics("flooded-area-2024-ads.png")
+```
+
+Para iniciar a análise, vamos verifica os dados tabelados de 2023.
+
+::: callout
+```{r}
+resumo_rs2023 <- rs2023 %>%
+  group_by(cidade) %>%
+  summarise(
+    n = n(),
+    med_preco_unitario = median(preco_unitario),
+    med_altura = median(altura),
+    min_data = as.Date(min(data_inclusao), format = "%d/%m/%Y"),
+    max_data = as.Date(max(data_inclusao), format = "%d/%m/%Y")
+  )
+
+datatable(
+  resumo_rs2023 %>%
+    mutate(across(where(is.numeric), \(x) round(x))),
+  caption = "Resumo dos dados de 2023",
+  colnames = c("Cidade", "N", "Mediana p. unitário",
+               "Mediana altura", "Data mín.", "Data máx.")
+)
+```
+:::
+
+E de 2024.
+
+::: callout
+```{r}
+resumo_rs2024 <- rs2024 %>%
+  group_by(cidade) %>%
+  summarise(
+    n = n(),
+    med_preco_unitario = median(preco_unitario),
+    med_altura = median(altura),
+    min_data = as.Date(min(data_inclusao), format = "%d/%m/%Y"),
+    max_data = as.Date(max(data_inclusao), format = "%d/%m/%Y")
+  )
+
+datatable(
+  resumo_rs2024 %>%
+    mutate(across(where(is.numeric), \(x) round(x))),
+  caption = "Resumo dos dados de 2024",
+  colnames = c("Cidade", "N", "Mediana p. unitário",
+               "Mediana altura", "Data mín.", "Data máx.")
+)
+```
+:::
+
+Primeiramente, vemos que estamos comparando o mesmo período de 2024 com 2023.
+
+Notamos, também, que a mediana do preço unitário dos aluguéis é maior em 2024 do que em 2023 para todas as cidades, exceto Esteio. Mas observa-se que houve uma diminuição de imóveis em pontos altos da cidade.
+
+## Análise gráfica
+
+Vamos verificar a relação entre nossas variáveis de interesse.
+
+```{r}
+#| column: screen-inset-shaded
+#| layout-nrow: 1
+#| fig-cap:
+#|   - "Anúncios em 2023"
+#|   - "Anúncios em 2024"
+
+ggpairs(rs2023, mapping = aes(color = cidade, alpha = 0.4))
+
+ggpairs(rs2024, mapping = aes(color = cidade, alpha = 0.4))
+```
+
+::: callout-warning
+### *Insights*
+
+-   Em 2023, observamos uma relação levemente negativa entre a altura e o preço unitário dos aluguéis.
+-   Em 2024, essa relação parece ser mais forte, com uma tendência de aumento do preço unitário com a altura.
+-   Em todas as cidades houve um aumento na correlação, exceto em Esteio.
+:::
+
+Vamos observar mais de perto a relação entre preço e data.
+
+```{r}
+ggarrange(
+  rs2023 %>%
+    ggplot(aes(x = data_inclusao, y = preco_unitario)) +
+    geom_point(aes(color = cidade), alpha = 0.5) +
+    geom_hline(yintercept = median(rs2023$preco_unitario), linetype = "dashed") +
+    labs(
+      title = "Preço unitário por data (2023)",
+      x = "Data",
+      y = "Preço unitário"
+    ) +
+    theme.base,
+  rs2024 %>%
+    ggplot(aes(x = data_inclusao, y = preco_unitario)) +
+    geom_point(aes(color = cidade), alpha = 0.5) +
+    geom_hline(yintercept = median(rs2024$preco_unitario), linetype = "dashed") +
+    labs(
+      title = "Preço unitário por data (2024)",
+      x = "Data",
+      y = "Preço unitário"
+    ) +
+    theme.base,
+  ncol = 2,
+  common.legend = TRUE,
+  legend = "bottom"
+)
+```
+
+::: callout-warning
+### *Insight*
+
+Observa-se que o preço unitário dos aluguéis aumentou em 2024 em relação a 2023.
+:::
+
+## Modelagem
+
+Para avaliar a influência da altura no preço unitário dos aluguéis, vamos ajustar um modelo de regressão linear.
+
+```{r}
+dados_rs2023 <- rs2023[-c(2657, 2656), ]
+dados_rs2023$dados_2023 <- dados_rs2023$preco_unitario
+modelo_2023 <- lm(
+  log(dados_2023) ~ altura + cidade,
+  data = dados_rs2023
+)
+# summary(modelo_2023)
+# confint(modelo_2023, level = 0.95)
+```
+
+```{r}
+dados_rs2024 <- rs2024[-c(2755), ]
+dados_rs2024$dados_2024 <- dados_rs2024$preco_unitario
+modelo_2024 <- lm(
+  log(dados_2024) ~ altura + cidade,
+  data = dados_rs2024
+)
+# summary(modelo_2024)
+# confint(modelo_2024, level = 0.95)
+```
+
+::: {.column-page-inset-left .column-page-inset-right}
+```{r}
+tab_model(modelo_2023, modelo_2024, digits = 5)
+```
+:::
+
+### Modelos
+
+Os modelos ajustados para 2023 e 2024 são:
+
+-   Para 2023:
+
+$$
+\begin{aligned}
+\text{Canoas:}\ & \log(\text{preço unitário}) = 0.001 \times \text{altura} + 3.18 \\
+\text{Esteio:}\ & \log(\text{preço unitário}) = 0.001 \times \text{altura} + 2.93 \\
+\text{Novo Hamburgo:}\ & \log(\text{preço unitário}) = 0.001 \times \text{altura} + 3.09 \\
+\text{São Leopoldo:}\ & \log(\text{preço unitário}) = 0.001 \times \text{altura} + 2.96 \\
+\text{Sapucaia do Sul:}\ & \log(\text{preço unitário}) = 0.001 \times \text{altura} + 2.64
+\end{aligned}
+$$
+
+-   Para 2024:
+
+$$
+\begin{aligned}
+\text{Canoas:}\ & \log(\text{preço unitário}) = 0.003 \times \text{altura} + 3.33 \\
+\text{Esteio:}\ & \log(\text{preço unitário}) = 0.003 \times \text{altura} + 2.91 \\
+\text{Novo Hamburgo:}\ & \log(\text{preço unitário}) = 0.003 \times \text{altura} + 3.12 \\
+\text{São Leopoldo:}\ & \log(\text{preço unitário}) = 0.003 \times \text{altura} + 3.02 \\
+\text{Sapucaia do Sul:}\ & \log(\text{preço unitário}) = 0.003 \times \text{altura} + 2.84
+\end{aligned}
+$$
+
+Já podemos identificar algumas informações.
+
+::: callout-warning
+### *Insights*
+
+-   O coeficiente de altura é mais significativo em 2024 do que em 2023.
+-   O coeficiente de cidade é significativo em ambos os anos.
+-   Todas as cidades tiveram aumento no preço unitário médio, exceto Esteio.
+:::
+
+### Resíduos
+
+```{r}
+# Extract diagnostic measures
+diagnostics_2023 <- augment(modelo_2023, data = dados_rs2023) %>%
+  mutate(
+    standardized_residuals = sqrt(rstandard(modelo_2023)),
+    cooks_distance = cooks.distance(modelo_2023),
+    leverage = hatvalues(modelo_2023)
+  )
+
+# Q-Q Plot
+qq_plot_2023 <- ggplot(diagnostics_2023, aes(sample = .resid, color = cidade)) +
+  stat_qq(alpha = 0.5) +
+  stat_qq_line(color = "black") +
+  labs(title = "Q-Q Plot of Residuals", x = "Theoretical Quantiles", y = "Sample Quantiles") +
+  theme_minimal() +
+  theme.base
+
+# Standardized Residuals Plot
+std_residuals_plot_2023 <- ggplot(diagnostics_2023, aes(x = .fitted, y = standardized_residuals, color = cidade)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 2, linetype = "dashed") +
+  labs(title = "Standardized Residuals vs Fitted", x = "Fitted Values", y = "Standardized Residuals") +
+  theme_minimal() +
+  theme.base
+
+# Cook's Distance Plot
+cooks_distance_plot_2023 <- ggplot(diagnostics_2023, aes(x = seq_along(.cooksd), y = cooks_distance, color = cidade)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 4 / (nrow(dados_rs2023) - length(coef(modelo_2023))), linetype = "dashed") +
+  labs(title = "Cook's Distance", x = "Observation Index", y = "Cook's Distance") +
+  theme_minimal() +
+  theme.base
+
+# Standardized Residuals vs Leverage
+residuals_leverage_plot_2023 <- ggplot(diagnostics_2023, aes(x = leverage, y = standardized_residuals, color = cidade)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 2, linetype = "dashed") +
+  labs(title = "Standardized Residuals vs Leverage", x = "Leverage", y = "Standardized Residuals") +
+  theme_minimal() +
+  theme.base
+```
+
+```{r}
+# Extract diagnostic measures
+diagnostics_2024 <- augment(modelo_2024, data = dados_rs2024) %>%
+  mutate(
+    standardized_residuals = sqrt(rstandard(modelo_2024)),
+    cooks_distance = cooks.distance(modelo_2024),
+    leverage = hatvalues(modelo_2024)
+  )
+
+# Q-Q Plot
+qq_plot_2024 <- ggplot(diagnostics_2024, aes(sample = .resid, color = cidade)) +
+  stat_qq(alpha = 0.5) +
+  stat_qq_line(color = "black") +
+  labs(title = "Q-Q Plot of Residuals", x = "Theoretical Quantiles", y = "Sample Quantiles") +
+  theme_minimal() +
+  theme.base
+
+# Standardized Residuals Plot
+std_residuals_plot_2024 <- ggplot(diagnostics_2024, aes(x = .fitted, y = standardized_residuals, color = cidade)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 2, linetype = "dashed") +
+  labs(title = "Standardized Residuals vs Fitted", x = "Fitted Values", y = "Standardized Residuals") +
+  theme_minimal() +
+  theme.base
+
+# Cook's Distance Plot
+cooks_distance_plot_2024 <- ggplot(diagnostics_2024, aes(x = seq_along(.cooksd), y = cooks_distance, color = cidade)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 4 / (nrow(dados_rs2024) - length(coef(modelo_2024))), linetype = "dashed") +
+  labs(title = "Cook's Distance", x = "Observation Index", y = "Cook's Distance") +
+  theme_minimal() +
+  theme.base
+
+# Standardized Residuals vs Leverage
+residuals_leverage_plot_2024 <- ggplot(diagnostics_2024, aes(x = leverage, y = standardized_residuals, color = cidade)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 2, linetype = "dashed") +
+  labs(title = "Standardized Residuals vs Leverage", x = "Leverage", y = "Standardized Residuals") +
+  theme_minimal() +
+  theme.base
+```
+
+```{r}
+#| column: screen-inset-shaded
+#| layout-nrow: 1
+#| fig-cap:
+#|   - "Modelo de 2023"
+#|   - "Modelo de 2024"
+
+ggarrange(
+  qq_plot_2023,
+  std_residuals_plot_2023,
+  cooks_distance_plot_2023,
+  residuals_leverage_plot_2023,
+  ncol = 2,
+  nrow=2,
+  common.legend = TRUE,
+  legend = "bottom"
+)
+
+ggarrange(
+  qq_plot_2024,
+  std_residuals_plot_2024,
+  cooks_distance_plot_2024,
+  residuals_leverage_plot_2024,
+  ncol = 2,
+  nrow=2,
+  common.legend = TRUE,
+  legend = "bottom"
+)
+```
+
+### Diferença significativa
+
+Para verificar se houve uma mudança significativa na influência da altura no preço unitário dos aluguéis, vamos comparar os modelos de 2023 e 2024.
+
+Para isso usaremos dois testes, o teste T para a diferença entre médias e o teste de Clogg et al. (1995)[[1]](#1) para a diferença entre os coeficientes.
+
+O teste de Clogg et al. (1995) é um teste Z, onde a estatística de teste é dada por:
+
+$$
+\text{Z} = \frac{\hat{\beta}_1 - \hat{\beta}_2}{\sqrt{\text{SD}_{\hat{\beta}_1}^2 + \text{SD}_{\hat{\beta}_2}^2}}
+$$
+
+```{r}
+# Os coeficientes para a variável altura dos modelos para 2023 e 2024 são iguais?
+altura_2023 <- 0.0008897
+sd_2023 <- 0.0001656
+n_2023 <- nrow(dados_rs2023)
+altura_2024 <- 0.0024735
+sd_2024 <- 0.0004089
+n_2024 <- nrow(dados_rs2024)
+
+# teste T para tamanhos de amostra diferentes
+graus_liberdade <- (
+  (sd_2023^2 / n_2023 + sd_2024^2 / n_2024)^2
+) / (
+  (sd_2023^2 / n_2023)^2 / (n_2023 - 1) + (sd_2024^2 / n_2024)^2 / (n_2024 - 1)
+)
+
+teste_t_estatistica <- (altura_2023 - altura_2024) / sqrt(sd_2023^2 / n_2023 + sd_2024^2 / n_2024)
+teste_t_p_valor <- 2 * pt(-abs(teste_t_estatistica), df = graus_liberdade)
+
+```
+
+```{r}
+# Clogg et al. (1995) formula as cited by Ray Paternoster et al. (1998)
+teste_clogg_estatistica <- (altura_2023 - altura_2024) / sqrt(sd_2023^2 + sd_2024^2)
+teste_clogg_p_valor <- 2 * pnorm(-abs(teste_clogg_estatistica))
+```
+
+```{r}
+estatisticas_testes <- tibble(
+  teste = c("T", "Clogg"),
+  estatistica = c(teste_t_estatistica, teste_clogg_estatistica),
+  p_valor = c(teste_t_p_valor, teste_clogg_p_valor)
+) %>%
+  mutate(across(where(is.numeric), \(x) round(x, 4)))
+
+datatable(
+  estatisticas_testes,
+  caption = "Testes para diferença entre os coeficientes de altura dos modelos de 2023 e 2024",
+  colnames = c("Teste", "Estatística", "P-valor")
+)
+```
+
+Assim, os testes indicam que houve uma mudança significativa na influência da altura no preço unitário dos aluguéis.
+
+::: callout-warning
+### *Insights*
+
+-   Ambos os testes indicam que houve uma mudança significativa na influência da altura no preço unitário dos aluguéis.
+-   O coeficiente de altura é mais significativo em 2024 do que em 2023.
+:::
+
+## Referências
+
+<a id="1">[1]</a> Clogg, C. C., Petkova, E., & Haritou, A. (1995). Statistical methods for comparing regression coefficients between models. American Journal of Sociology, 100(5)

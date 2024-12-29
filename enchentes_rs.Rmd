@@ -1,0 +1,340 @@
+---
+title: "R Notebook"
+author: "Arquimedes Macedo"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+Sys.setenv(lang = "en_US")
+Sys.setlocale("LC_ALL", "en_US.UTF-8")
+knitr::opts_chunk$set(
+  echo = knitr::is_html_output(),
+  warning = FALSE,
+  message = FALSE,
+  out.extra = "keepaspectratio=true",
+  fig.align = "center",
+  out.height = "\\textheight",
+  out.width = "\\textwidth"
+)
+
+get_output_format <- function() {
+  output <- rmarkdown:::parse_yaml_front_matter(readLines(knitr::current_input()))$output
+  if (is.list(output)) {
+    return(names(output)[1])
+  } else {
+    return(output[1])
+  }
+}
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+required_packages <- c("tidyverse", "dplyr", "GGally", "gridExtra", "knitr", "gganimate",
+                       "broom", "purrr", "plotly", "ggfortify", "reshape2", "skimr",
+                       "readxl", "ggpubr", "olsrr", "glmnet")
+
+for (pkg in required_packages) {
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+    library(pkg, character.only = TRUE)
+  }
+}
+```
+
+
+```{r}
+theme.base <- theme_minimal(base_size = 11) +
+  theme(
+    axis.text = element_text(size = 8),
+    plot.title = element_text(hjust = 0.5, size = 10, face = "bold"),
+    axis.title = element_text(size = 8),
+    legend.title = element_text(size = 8),
+    panel.grid.major = element_line(colour = "grey90", linewidth = 0.5),
+    panel.grid.minor = element_line(colour = adjustcolor("grey90", alpha.f = 0.5), linewidth = 0.25),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    plot.background = element_blank(),
+    axis.line.x = element_line(colour = "grey"),
+    axis.line.y = element_line(colour = "grey"),
+  )
+
+theme.no_legend <- theme(legend.position = "none")
+
+theme.legend_bottom <- theme(legend.position = "bottom")
+
+theme.no_grid <- theme(
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank()
+)
+
+theme.no_axis <- theme(
+  axis.line.x = element_blank(),
+  axis.line.y = element_blank()
+)
+
+# Theme for timeseries with legend
+apply.theme.ts.legend <- function() {
+  list(
+    scale_x_date(date_labels = "%b %d", date_breaks = "1 week"),
+    theme.base +
+      theme(
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank()
+      )
+  )
+}
+```
+
+
+
+```{r}
+rs2023 <- read_excel("2023-alturas.xlsx",
+  col_types = c(
+    "date", "skip", "skip",
+    "skip", "skip", "skip", "skip", "skip",
+    "skip", "skip", "skip", "skip", "text",
+    "skip", "numeric", "numeric", "numeric",
+    "numeric", "numeric"
+  )
+) %>%
+  filter(preco_unitario < 150 & cidade != "Porto Alegre") %>%
+  select(cidade, data_inclusao, preco_unitario, altura)
+
+rs2024 <- read_excel("2024-alturas.xlsx",
+  col_types = c(
+    "date", "skip", "skip",
+    "skip", "skip", "skip", "skip", "skip",
+    "skip", "skip", "skip", "skip", "text",
+    "skip", "numeric", "numeric", "numeric",
+    "numeric", "numeric"
+  )
+) %>%
+  filter(preco_unitario < 150 & cidade != "Porto Alegre") %>%
+  select(cidade, data_inclusao, preco_unitario, altura)
+```
+
+
+```{r}
+rs2023 %>%
+  group_by(cidade) %>%
+  skim()
+```
+
+```{r}
+rs2024 %>%
+  group_by(cidade) %>%
+  skim()
+```
+
+```{r message=FALSE, warning=FALSE}
+ggpairs(rs2023, mapping = aes(color = cidade, alpha = 0.4))
+```
+
+```{r message=FALSE, warning=FALSE}
+ggpairs(rs2024, mapping = aes(color = cidade, alpha = 0.4))
+```
+
+
+
+```{r message=FALSE, warning=FALSE}
+ggarrange(
+  rs2023 %>%
+    ggplot(aes(x = data_inclusao, y = preco_unitario)) +
+    geom_point(aes(color = cidade), alpha = 0.5) +
+    geom_hline(yintercept = median(rs2023$preco_unitario), linetype = "dashed") +
+    labs(
+      title = "Preço unitário por data (2023)",
+      x = "Data",
+      y = "Preço unitário"
+    ) +
+    theme.base,
+  rs2024 %>%
+    ggplot(aes(x = data_inclusao, y = preco_unitario)) +
+    geom_point(aes(color = cidade), alpha = 0.5) +
+    geom_hline(yintercept = median(rs2024$preco_unitario), linetype = "dashed") +
+    labs(
+      title = "Preço unitário por data (2024)",
+      x = "Data",
+      y = "Preço unitário"
+    ) +
+    theme.base,
+  ncol = 2,
+  common.legend = TRUE,
+  legend = "bottom"
+)
+```
+
+
+```{r}
+dados_rs2023 <- rs2023[-c(2657, 2656), ]
+modelo_2023 <- lm(
+  log(preco_unitario) ~ altura + cidade,
+  data = dados_rs2023
+)
+summary(modelo_2023)
+confint(modelo_2023, level = 0.95)
+# plot(modelo_2023)
+# ols_plot_resid_stand(modelo_2023, threshold = 3)
+# ols_regress(modelo_2023)
+```
+
+
+
+```{r}
+# Load required library
+library(ggplot2)
+library(dplyr)
+library(gridExtra)
+
+# Extract diagnostic measures
+diagnostics <- augment(modelo_2023, data = dados_rs2023) %>%
+  mutate(
+    standardized_residuals = sqrt(rstandard(modelo_2023)),
+    cooks_distance = cooks.distance(modelo_2023),
+    leverage = hatvalues(modelo_2023)
+  )
+
+# Q-Q Plot
+qq_plot <- ggplot(diagnostics, aes(sample = .resid, color = cidade)) +
+  stat_qq(alpha = 0.5) +
+  stat_qq_line(color = "black") +
+  labs(title = "Q-Q Plot of Residuals", x = "Theoretical Quantiles", y = "Sample Quantiles") +
+  theme_minimal() +
+  theme.base
+
+# Standardized Residuals Plot
+std_residuals_plot <- ggplot(diagnostics, aes(x = .fitted, y = standardized_residuals, color = cidade)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 2, linetype = "dashed") +
+  labs(title = "Standardized Residuals vs Fitted", x = "Fitted Values", y = "Standardized Residuals") +
+  theme_minimal() +
+  theme.base
+
+# Cook's Distance Plot
+cooks_distance_plot <- ggplot(diagnostics, aes(x = seq_along(.cooksd), y = cooks_distance, color = cidade)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 4 / (nrow(dados_rs2023) - length(coef(modelo_2023))), linetype = "dashed") +
+  labs(title = "Cook's Distance", x = "Observation Index", y = "Cook's Distance") +
+  theme_minimal() +
+  theme.base
+
+# Standardized Residuals vs Leverage
+residuals_leverage_plot <- ggplot(diagnostics, aes(x = leverage, y = standardized_residuals, color = cidade)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 2, linetype = "dashed") +
+  labs(title = "Standardized Residuals vs Leverage", x = "Leverage", y = "Standardized Residuals") +
+  theme_minimal() +
+  theme.base
+
+# Display plots
+grid.arrange(
+  qq_plot,
+  std_residuals_plot,
+  cooks_distance_plot,
+  residuals_leverage_plot,
+  ncol = 2
+)
+```
+
+
+
+```{r}
+dados_rs2024 <- rs2024[-c(2755), ]
+modelo_2024 <- lm(
+  log(preco_unitario) ~ altura + cidade,
+  data = dados_rs2024
+)
+summary(modelo_2024)
+confint(modelo_2024, level = 0.95)
+# plot(modelo_2024)
+# ols_plot_resid_stand(modelo_2024, threshold = 3)
+```
+
+```{r}
+# Extract diagnostic measures
+diagnostics <- augment(modelo_2024, data = dados_rs2024) %>%
+  mutate(
+    standardized_residuals = sqrt(rstandard(modelo_2024)),
+    cooks_distance = cooks.distance(modelo_2024),
+    leverage = hatvalues(modelo_2024)
+  )
+
+# Q-Q Plot
+qq_plot <- ggplot(diagnostics, aes(sample = .resid, color = cidade)) +
+  stat_qq(alpha = 0.5) +
+  stat_qq_line(color = "black") +
+  labs(title = "Q-Q Plot of Residuals", x = "Theoretical Quantiles", y = "Sample Quantiles") +
+  theme_minimal() +
+  theme.base
+
+# Standardized Residuals Plot
+std_residuals_plot <- ggplot(diagnostics, aes(x = .fitted, y = standardized_residuals, color = cidade)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 2, linetype = "dashed") +
+  labs(title = "Standardized Residuals vs Fitted", x = "Fitted Values", y = "Standardized Residuals") +
+  theme_minimal() +
+  theme.base
+
+# Cook's Distance Plot
+cooks_distance_plot <- ggplot(diagnostics, aes(x = seq_along(.cooksd), y = cooks_distance, color = cidade)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 4 / (nrow(dados_rs2024) - length(coef(modelo_2024))), linetype = "dashed") +
+  labs(title = "Cook's Distance", x = "Observation Index", y = "Cook's Distance") +
+  theme_minimal() +
+  theme.base
+
+# Standardized Residuals vs Leverage
+residuals_leverage_plot <- ggplot(diagnostics, aes(x = leverage, y = standardized_residuals, color = cidade)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 2, linetype = "dashed") +
+  labs(title = "Standardized Residuals vs Leverage", x = "Leverage", y = "Standardized Residuals") +
+  theme_minimal() +
+  theme.base
+
+# Display plots
+grid.arrange(
+  qq_plot,
+  std_residuals_plot,
+  cooks_distance_plot,
+  residuals_leverage_plot,
+  ncol = 2
+)
+```
+
+
+
+```{r}
+# Os coeficientes para a variável altura dos modelos para 2023 e 2024 são iguais?
+altura_2023 <- 0.0008897
+sd_2023 <- 0.0001656
+n_2023 <- nrow(dados_rs2023)
+altura_2024 <- 0.0024735
+sd_2024 <- 0.0004089
+n_2024 <- nrow(dados_rs2024)
+
+# teste T
+graus_liberdade <- (
+  (sd_2023^2 / n_2023 + sd_2024^2 / n_2024)^2
+) / (
+  (sd_2023^2 / n_2023)^2 / (n_2023 - 1) + (sd_2024^2 / n_2024)^2 / (n_2024 - 1)
+)
+
+t <- (altura_2023 - altura_2024) / sqrt(sd_2023^2 / n_2023 + sd_2024^2 / n_2024)
+
+p_valor <- 2 * pt(-abs(t), df = graus_liberdade)
+
+t
+p_valor
+ifelse(p_valor > 0.05, "Iguais", "Diferentes")
+```
+
+```{r}
+# Clogg et al. (1995) formula as cited by Ray Paternoster et al. (1998)
+v <- (altura_2023 - altura_2024) / sqrt(sd_2023^2 + sd_2024^2)
+v
+2 * pnorm(-abs(v))
+```
+
+

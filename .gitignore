@@ -1,0 +1,5 @@
+.*
+!.gitignore
+*.xls*
+index_files
+dados-rs
