@@ -202,8 +202,8 @@ datatable(
 ### *Insights*
 
 -   Estamos comparando o mesmo período de 2024 com 2023.
--   A mediana do preço unitário dos aluguéis é maior em 2024 do que em 2023 para todas as cidades, exceto Esteio.
--   Em Esteio houve uma diminuição de imóveis em pontos altos da cidade.
+-   A mediana do preço unitário dos aluguéis aumentou para todas as cidades, exceto Esteio.
+-   Em todas as cidades houve aumento da oferta de imóveis em regiões mais baixas, possívelmente de pessoas querendo sair de áreas de risco.
 :::
 
 ### Distribuição Geográfica
@@ -346,10 +346,10 @@ ggarrange(
   rs2023 %>%
     ggplot(aes(x = data_inclusao, y = log_preco_unitario)) +
     geom_point(aes(color = cidade), alpha = 0.5) +
-    geom_hline(yintercept = median_2023, linetype = "dashed") +
+    geom_hline(yintercept = median_2023, linetype = "dashed", size = 0.7) +
     annotate(
       "text", x = as.POSIXct("2023-04-30", format = "%Y-%m-%d"),
-      y = median_2023 + 0.1, label = "2023"
+      y = median_2023 + 0.1, label = "2023", fontface = 2
     ) +
     scale_y_continuous(limits = c(1.5, 5)) +
     labs(
@@ -361,15 +361,15 @@ ggarrange(
   rs2024 %>%
     ggplot(aes(x = data_inclusao, y = log_preco_unitario)) +
     geom_point(aes(color = cidade), alpha = 0.5) +
-    geom_hline(yintercept = median_2023, color = "red", linetype = "dashed") +
+    geom_hline(yintercept = median_2023, color = "red", linetype = "dashed", size = 0.7) +
     annotate(
       "text", x = as.POSIXct("2024-04-30", format = "%Y-%m-%d"),
-      y = median_2023 - 0.1, label = "2023", color = "red"
+      y = median_2023 - 0.1, label = "2023", fontface = 2, color = "red"
     ) +
-    geom_hline(yintercept = median_2024, linetype = "dashed") +
+    geom_hline(yintercept = median_2024, linetype = "dashed", size = 0.7) +
     annotate(
       "text", x = as.POSIXct("2024-04-30", format = "%Y-%m-%d"),
-      y = median_2024 + 0.1, label = "2024"
+      y = median_2024 + 0.1, label = "2024", fontface = 2
     ) +
     scale_y_continuous(limits = c(1.5, 5)) +
     labs(
@@ -416,7 +416,7 @@ ggarrange(
     ggplot(aes(x = altura, y = log_preco_unitario)) +
     geom_point(aes(color = cidade), alpha = 0.5) +
     geom_smooth(method = "lm", se = FALSE, formula = y ~ x) +
-    geom_hline(yintercept = median(rs2024$log_preco_unitario), linetype = "dashed") +
+    geom_hline(yintercept = median(rs2024$log_preco_unitario), linetype = "dashed", size = 0.7) +
     labs(
       title = "Preço unitário por altura (2024)",
       x = "Altura",
