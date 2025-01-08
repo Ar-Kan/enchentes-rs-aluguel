@@ -694,14 +694,6 @@ Assim, os testes indicam que houve uma mudança significativa na influência da 
 - O coeficiente de altura é mais significativo em 2024 do que em 2023.
 :::
 
-## Sugestões para trabalhos futuros
-
-Ficam aqui algumas questões pertinentes para futuras investigações:
-
-- Como a relação atual entre a altura e o preço se comporta se modelado por séries temporais?
-- Em 1941 houveram, também enchentes, mas em 2023 a correlação entre altura e preço era insignificante. Por quanto tempo a relação atual se manterá? Quando começa a diminuir?
-- Em cidades que não foram atingidas a altura passou a ser significante?
-
 ## Curiosidade
 
 O índice de preços FipeZap para aluguéis residenciais, deixou de funcionar depois das enchentes.
@@ -734,6 +726,21 @@ tab_model(modelo_2023, modelo_2024, digits = 3)
 - Na segunda metade de 2023, o índice conseguia explicar em torno de $0.5\%$ da variabilidade dos preços.
 - Depois das enchentes, o índice deixou de explicar a variabilidade dos preços.
 :::
+
+## Conclusão
+
+Neste trabalho, investigamos a influência da altura em relação ao nível do mar no preço de anúncios de locação pós-enchentes do RS/Brasil.
+
+Os resultados indicam que a altura deve ter passado a ter uma influência significativa no preço dos aluguéis após as enchentes, com um aumento na correlação entre altura e preço.
+
+
+## Sugestões para trabalhos futuros
+
+Ficam aqui algumas questões pertinentes para futuras investigações:
+
+- Como a relação atual entre a altura e o preço se comporta se modelado por séries temporais?
+- Em 1941 houveram, também enchentes, mas em 2023 a correlação entre altura e preço era insignificante. Por quanto tempo a relação atual se manterá? Quando começa a diminuir?
+- Em cidades que não foram atingidas a altura passou a ser significante?
 
 ## Referências
 
